@@ -37,6 +37,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug SSH key
+        run: echo "${{ secrets.SSH_KEY }}" | head -1
+
       - name: Copy files to production via SSH
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: appleboy/scp-action@v1
