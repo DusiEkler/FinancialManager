@@ -9,7 +9,7 @@ on:
       - "main"
 jobs:
   backend_python:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4
@@ -32,43 +32,26 @@ jobs:
             yuriichechur/backend_python:latest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: backend_python
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug SSH key lines
-        run: echo "${{ secrets.SSH_KEY }}" | wc -l
-
-      - name: Copy files to production via SSH
+      - name: Deploy to Production
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            mkdir -p /home/ubuntu/FinancialManager/production
-            curl -o /home/ubuntu/FinancialManager/production/docker-compose.yml \
-              https://raw.githubusercontent.com/DusiEkler/FinancialManager/develop/docker-compose.yml
-            cd /home/ubuntu/FinancialManager/production
-            docker-compose pull backend_python
-            docker-compose up backend_python --force-recreate -d
+        run: |
+          mkdir -p /home/ubuntu/FinancialManager/production
+          cp docker-compose.yml /home/ubuntu/FinancialManager/production/
+          cd /home/ubuntu/FinancialManager/production
+          docker-compose pull backend_python
+          docker-compose up backend_python --force-recreate -d
 
-      - name: Copy files to staging via SSH
+      - name: Deploy to Staging
         if: ${{ github.ref == 'refs/heads/develop' }}
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            mkdir -p /home/ubuntu/FinancialManager/staging
-            curl -o /home/ubuntu/FinancialManager/staging/docker-compose.yml \
-              https://raw.githubusercontent.com/DusiEkler/FinancialManager/develop/docker-compose.yml
-            cd /home/ubuntu/FinancialManager/staging
-            docker-compose pull backend_python
-            docker-compose up backend_python --force-recreate -d
+        run: |
+          mkdir -p /home/ubuntu/FinancialManager/staging
+          cp docker-compose.yml /home/ubuntu/FinancialManager/staging/
+          cd /home/ubuntu/FinancialManager/staging
+          docker-compose pull backend_python
+          docker-compose up backend_python --force-recreate -d
