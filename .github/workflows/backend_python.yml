@@ -38,32 +38,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug SSH key
-        run: echo "${{ secrets.SSH_KEY }}" | head -1
+      - name: Debug SSH key lines
+        run: echo "${{ secrets.SSH_KEY }}" | wc -l
 
       - name: Copy files to production via SSH
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          source: "docker-compose.yml"
-          target: /home/ubuntu/FinancialManager/production
-
-      - name: Copy files to staging via SSH
-        if: ${{ github.ref == 'refs/heads/develop' }}
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          source: "docker-compose.yml"
-          target: /home/ubuntu/FinancialManager/staging
-
-      - name: Deploy to Production
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: appleboy/ssh-action@v1
         with:
@@ -72,11 +50,14 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
+            mkdir -p /home/ubuntu/FinancialManager/production
+            curl -o /home/ubuntu/FinancialManager/production/docker-compose.yml \
+              https://raw.githubusercontent.com/DusiEkler/FinancialManager/develop/docker-compose.yml
             cd /home/ubuntu/FinancialManager/production
             docker-compose pull backend_python
             docker-compose up backend_python --force-recreate -d
 
-      - name: Deploy to Staging
+      - name: Copy files to staging via SSH
         if: ${{ github.ref == 'refs/heads/develop' }}
         uses: appleboy/ssh-action@v1
         with:
@@ -85,6 +66,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
+            mkdir -p /home/ubuntu/FinancialManager/staging
+            curl -o /home/ubuntu/FinancialManager/staging/docker-compose.yml \
+              https://raw.githubusercontent.com/DusiEkler/FinancialManager/develop/docker-compose.yml
             cd /home/ubuntu/FinancialManager/staging
             docker-compose pull backend_python
             docker-compose up backend_python --force-recreate -d
