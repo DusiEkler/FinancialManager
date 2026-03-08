@@ -9,7 +9,7 @@ on:
       - "main"
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4
@@ -31,56 +31,26 @@ jobs:
             yuriichechur/frontend:${{github.run_number}} 
             yuriichechur/frontend:latest
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Copy files to production via SSH
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          source: "docker-compose.yml"
-          target: /home/ubuntu/FinancialManager/production
-
-      - name: Copy files to staging via SSH
-        if: ${{ github.ref == 'refs/heads/develop' }}
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          source: "docker-compose.yml"
-          target: /home/ubuntu/FinancialManager/staging
-
       - name: Deploy to Production
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            cd /home/ubuntu/FinancialManager/production
-            docker-compose pull frontend
-            docker-compose up frontend --force-recreate -d
+        run: |
+          mkdir -p /home/ubuntu/FinancialManager/production
+          cp docker-compose.yml /home/ubuntu/FinancialManager/production/
+          cd /home/ubuntu/FinancialManager/production
+          docker-compose pull frontend
+          docker-compose up frontend --force-recreate -d
 
       - name: Deploy to Staging
         if: ${{ github.ref == 'refs/heads/develop' }}
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          script: |
-            cd /home/ubuntu/FinancialManager/staging
-            docker-compose pull frontend
-            docker-compose up frontend --force-recreate -d
+        run: |
+          mkdir -p /home/ubuntu/FinancialManager/staging
+          cp docker-compose.yml /home/ubuntu/FinancialManager/staging/
+          cd /home/ubuntu/FinancialManager/staging
+          docker-compose pull frontend
+          docker-compose up frontend --force-recreate -d
