@@ -1,0 +1,70 @@
+services:
+  frontend:
+    image: yuriichechur/frontend:latest
+    container_name: Frontend
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      - backend_python
+    networks:
+      - app_network
+
+  backend_python:
+    image: yuriichechur/backend_python:latest
+    container_name: Backend_Python
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend_java
+    networks:
+      - app_network
+  
+  backend_java:
+    image: yuriichechur/backend_java:latest
+    container_name: Backend_Java
+    restart: unless-stopped
+    ports:
+     - "1500:1500"
+    networks:
+     - app_network
+  
+  postgres:
+    image: postgres:16-alpine
+    container_name: my_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_network
+
+  n8n:
+    image: n8nio/n8n:stable
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    volumes: 
+      - n8n:/home/node/.n8n
+    networks:
+      - app_network
+  
+
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  n8n: 
