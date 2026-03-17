@@ -13,6 +13,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Lint python file
+        run: |
+          python3 -m venv venv
+          venv/bin/pip install flake8
+          venv/bin/flake8 Backend_Python/
+
       - name: Login in DockerHub
         uses: docker/login-action@v3
         with:
