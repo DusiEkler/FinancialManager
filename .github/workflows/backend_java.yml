@@ -1,5 +1,5 @@
 name: backend-java-pipeline
-run-name:
+run-name: "Java Python - ${{ github.ref_name }} #${{ github.run_number }}"
 on:
   push:
     paths:

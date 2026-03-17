@@ -1,5 +1,5 @@
 name: frontend-pipeline
-run-name:
+run-name: "Frontend - ${{ github.ref_name }} #${{ github.run_number }}"
 on:
   push:
     paths:
