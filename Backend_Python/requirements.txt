@@ -1,2 +1,6 @@
-openai
-##sssssss
+sqlalchemy>=2.0
+alembic
+psycopg2-binary
+pgvector
+python-dotenv
+pydantic
