@@ -2,6 +2,9 @@ from models import ParsedTransaction, TransactionOut
 import json
 from categorizer import get_category
 
+def convert_csv_to_json():
+    pass
+
 def parse_monobank_statement(_data: str) -> list:
     data = json.loads(_data)
 
@@ -20,4 +23,4 @@ def parse_monobank_statement(_data: str) -> list:
 
 with open("transactions.json", "r") as file:
     data = file.read()
-    parse_monobank_statement(data)
+    print(parse_monobank_statement(data))
