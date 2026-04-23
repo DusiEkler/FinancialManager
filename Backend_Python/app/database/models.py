@@ -15,11 +15,11 @@ class Transaction(base):
     amount: Mapped[float] = mapped_column(Float)
     description: Mapped[str] = mapped_column(String(100))
     mcc: Mapped[int] = mapped_column(Integer)
-    counter_name: Mapped[str] = mapped_column(String(30))
-    category: Mapped[str] = mapped_column(String(30))
+    counter_name: Mapped[str] = mapped_column(String(300))
+    category: Mapped[str] = mapped_column(String(100))
 
 class TransactionEmbedding(base):
     __tablename__ = "transaction_embedding"
     id: Mapped[int] = mapped_column(primary_key = True, autoincrement=True)
     transaction_id: Mapped[str] = mapped_column(ForeignKey("transaction.id"))
-    embedding: Mapped[Vector] = mapped_column(Vector(1536))
+    embedding: Mapped[Vector] = mapped_column(Vector(3072))

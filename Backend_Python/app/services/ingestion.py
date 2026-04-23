@@ -2,12 +2,17 @@ from app.schemas.parser_schemas import TransactionOut
 from app.database.models import Transaction, TransactionEmbedding
 from openai import OpenAI
 from sqlalchemy.dialects.postgresql import insert
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 
 
 class IngestionService:
     def __init__(self, db_session):
         self.db_session = db_session
-        self.client = OpenAI()
+        self.client = OpenAI(api_key=os.getenv('API_KEY'),
+                             base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
     
     def ingest_transaction(self, schema: list[TransactionOut]):
         descriptions_list = []
@@ -21,7 +26,7 @@ class IngestionService:
         
         response = self.client.embeddings.create(
         input=descriptions_list,
-        model="text-embedding-3-small"
+        model="gemini-embedding-001"
         )
         
         embeddings_list = []
