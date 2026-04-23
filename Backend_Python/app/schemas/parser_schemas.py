@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, ValidationError, field_validator, Field, ConfigDict
 from datetime import datetime
 from typing import Any
 
@@ -11,12 +11,13 @@ class ParsedTransaction(BaseModel):
     counterName: str
 
 class TransactionOut(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     id: str
     time: datetime
     amount: float
     description: str
     mcc: int
-    counterName: str
+    counter_name: str = Field(alias='counterName')
     category: str
 
     @field_validator('amount', mode='before')
