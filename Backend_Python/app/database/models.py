@@ -1,4 +1,4 @@
-from database.database import db
+from app.database.database import db
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import Mapped
 from sqlalchemy import String, Float, Integer, DateTime
