@@ -1,13 +1,10 @@
 from app.schemas.parser_schemas import ParsedTransaction, TransactionOut
-import json
 from app.services.categorizer import get_category
 
 def convert_csv_to_json():
     pass
 
-def parse_monobank_statement(_data: str) -> list:
-    data = json.loads(_data)
-
+def parse_monobank_statement(data: list[dict]) -> list:
     transactions = []
 
     for transaction in data:
