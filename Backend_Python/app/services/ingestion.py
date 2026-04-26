@@ -1,5 +1,5 @@
-from app.schemas.parser_schemas import TransactionOut
-from app.database.models import Transaction, TransactionEmbedding
+from schemas.parser_schemas import TransactionOut
+from database.models import Transaction, TransactionEmbedding
 from openai import OpenAI
 from sqlalchemy.dialects.postgresql import insert
 import os
@@ -29,6 +29,7 @@ class IngestionService:
         model="gemini-embedding-001"
         )
         
+        print(response.data)
         embeddings_list = []
         for i, _transaction in enumerate(response.data):
             embeddings_list.append({
