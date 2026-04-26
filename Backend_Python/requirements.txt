@@ -8,3 +8,4 @@ pgvector
 python-dotenv
 fastapi==0.136.0
 uvicorn==0.45.0
+pytest==9.0.3
